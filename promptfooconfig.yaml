@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "OPHP Assist - Week 1 baseline (no controls)"
+
+# Each attack in attacks.yaml sets a `prompt` variable; this passes it straight
+# through to the agent as the patient's message.
+prompts:
+  - "{{prompt}}"
+
+# The target is YOUR agent, not a raw model. promptfoo imports agent.py and
+# calls call_api() once per attack.
+providers:
+  - id: file://agent.py
+    label: ophp-assist-baseline
+    config:
+      # Use the Python inside the virtual environment (Windows path).
+      pythonExecutable: .venv/Scripts/python.exe
+
+tests: file://attacks.yaml
+
+# The model that grades the llm-rubric (medical advice) cases.
+defaultTest:
+  options:
+    provider: anthropic:messages:claude-sonnet-4-6
+
+# Keep it gentle on the API. 2 attacks at a time is plenty.
+commandLineOptions:
+  maxConcurrency: 2
+
+# Where the results land. This file feeds the blog post and, later, the
+# browser explorer on your site.
+outputPath: results/baseline.json
